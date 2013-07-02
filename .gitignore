@@ -19,3 +19,6 @@ Release
 *.sdf
 *.suo
 
+!Lib/Debug
+!Lib/Release
+
