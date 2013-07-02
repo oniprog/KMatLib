@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source File">
+      <UniqueIdentifier>{b2fae188-2168-465b-868a-054ba35d57b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="KMat.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+    <ClCompile Include="KMatTest.cpp">
+      <Filter>Source File</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KMat.h">
+      <Filter>Source File</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source File</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

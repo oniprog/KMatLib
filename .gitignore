@@ -11,3 +11,11 @@
 *.lai
 *.la
 *.a
+
+boost_1_53_0
+Debug
+Release
+*.opensdf
+*.sdf
+*.suo
+
