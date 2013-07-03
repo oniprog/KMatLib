@@ -5,12 +5,12 @@ Tiny matrix calculation library.
 
 The features are as follows.
 
-1. Use stack instated of heap. 
-2. C++ template library. And simple. (in other words, too limited function and under development ).
-3. License is public domain ( my writing part ). (Notice: Obviously Google C++ Unit Testing framework part is another licesence. )
+1. This library uses the stack instaed of the heap. 
+2. This is a simple C++ template library. (in other words, This library is under development ).
+3. In this library, a part written by me is public domain license. (Notice: Obviously Google C++ Unit Testing framework part is the new BSD License. )
 
-By using stack, high performace can gain compared with ordinary matrix library.
-However, stack is so limited resource compared with heap. Sometime stackover flows may be occur. Therefore this library can adopt for tiny matrix( N <= 10 ).
+By using the stack, high performace can gain compared with ordinary matrix library.
+This library may adopt for a tiny matrix ( about N <= 10 ) because "stack overflow" may be occur. The stack is so limited resource, then this library cannot handle big matrix.
  
 日本語での説明
 =======
