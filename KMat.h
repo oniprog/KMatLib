@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <boost/numeric/ublas/matrix.hpp>
+
 namespace kblas {
 
 // ベクトルクラス 
@@ -23,6 +25,9 @@ public:
     const T operator()(int i) const {
         return m_v[i];
     }
+
+	
+
 private:
     T   m_v[N];
 };
@@ -43,6 +48,19 @@ public:
 
     KMat() {}
 
+	KMat(const T&v ) {
+        for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
+            (*this)(i,j) = v;
+        }
+	}
+
+	KMat(const boost::numeric::ublas::matrix<T> &mat ) {
+		if( mat.size1() != N ) throw std::invalid_argument("size y is diffrent.");
+		if( mat.size2() != M ) throw std::invalid_argument("size x is diffrent.");
+		for(int i=0;i<N; ++i ) for(int j=0; j<M; ++j )
+			(*this)(i,j) = mat(i,j);
+	}
+
     KMat( const KMatTrans<T,N,M> &m1 ) {
         for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
             (*this)(i,j) = m1(j,i);
@@ -55,6 +73,19 @@ public:
     const T operator()(int i, int j) const {
         return m_v[i*M+j];
     }
+
+	KMat & operator +=( const KMat<T,M,N> &m1 ) {
+        for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
+            (*this)(i,j) += m1(i,j);
+		}
+		return *this;
+	}
+
+	void	CopyTo( boost::numeric::ublas::matrix<T> &bm ) {
+        for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
+			bm(i,j) = (*this)(i,j);
+		}
+	}
 
 private:
     T   m_v[N*M];
@@ -523,6 +554,50 @@ template<class T, int M, int N>
 KMat<T, N, M> trans( KMatTrans<T, M, N> &&m1 ) {
     return KMat<T,N,M>( std::move(m1) );
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+namespace Detail {
+
+template<class T,int M, int N, int i, int j>
+struct MultRC2 {
+	static void f(KMat<T,M,N> &m1, const T &v ) {
+		m1(i,j) *= v;
+		MultRC2<T,M,N,i,j-1>::f(m1,v);
+	}
+};
+
+template<class T,int M, int N, int i>
+struct MultRC2<T,M,N,i,-1> {
+
+	static void f(KMat<T,M,N> &m1, const T &v ) {
+	}
+};
+
+template<class T,int M, int N, int i>
+struct MultRC {
+	static void f( KMat<T,M,N> &m1, const T &v ) {
+		MultRC2<T,M,N,i,N-1>::f( m1, v );
+		MultRC<T,M,N,i-1>::f( m1, v );
+	}
+};
+
+template<class T, int M, int N>
+struct MultRC<T,M,N,-1> {
+	static void f( KMat<T,M,N> &m1, const T & v) {
+	}
+};
+
+}; // namepsace Detail
+
+///////////////////////////////////////////////////////////////////////////////////
+template<class T,int M, int N>
+KMat<T, M, N> operator * ( KMat<T, M, N> &m1, const T & v ) {
+	KMat<T,M,N> ret(m1);
+	Detail::MultRC<T, M, N, M-1>::f( ret, v );
+	return ret;
+}
+
+
 
 } // namespace kblas
 
