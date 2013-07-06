@@ -35,6 +35,50 @@ private:
 template<class T, int N, int M>
 class KMatTrans;
 
+template<class T, int M, int N>
+class KMat;
+
+namespace Detail {
+
+    //////////////////////////////////////////////////////////////////////
+    /// 行列同士の足し算
+    template<class T, int M, int N, int i, int j>
+    struct AddMM_2 {
+        static void f( KMat<T,M,N> &m1, const KMat<T,M,N> &m2 ) {
+            m1(i,j) += m2(i,j);
+            AddMM_2<T,M,N,i,j-1>::f(m1,m2);
+        }
+    };
+
+    template<class T, int M, int N, int i>
+    struct AddMM_2<T,M,N,i,-1> {
+        static void f( KMat<T,M,N> &m1, const KMat<T,M,N> &m2 ) {
+        }
+    };
+
+    template<class T, int M, int N, int i>
+    struct AddMM_1 {
+        static void f( KMat<T,M,N> &m1, const KMat<T,M,N> &m2 ) {
+            AddMM_2<T,M,N,i,N-1>::f(m1, m2);
+            AddMM_1<T,M,N,i-1>::f(m1,m2);
+        }
+    };
+
+    template<class T, int M, int N>
+    struct AddMM_1<T,M,N,-1> {
+        static void f( KMat<T,M,N> &m1, const KMat<T,M,N> &m2 ) {
+        }
+    };
+
+    template<class T, int M, int N>
+    struct AddMM {
+        static void f( KMat<T,M,N> &m1, const KMat<T,M,N>&m2 ) {
+            AddMM_1<T,M,N,M-1>::f(m1, m2);
+        }
+    };
+}
+
+
 // 行列クラス
 template<class T, int N, int M>
 // T 型
@@ -74,14 +118,14 @@ public:
         return m_v[i*M+j];
     }
 
-	KMat & operator +=( const KMat<T,M,N> &m1 ) {
-        for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
-            (*this)(i,j) += m1(i,j);
-		}
+	KMat & operator +=( const KMat<T,N,M> &m1 ) {
+
+        Detail::AddMM<T,N,M>::f(*this, m1);
 		return *this;
 	}
 
 	void	CopyTo( boost::numeric::ublas::matrix<T> &bm ) {
+
         for( int i=0; i<N; ++i ) for( int j=0; j<M; ++j ) {
 			bm(i,j) = (*this)(i,j);
 		}
@@ -590,6 +634,7 @@ struct MultRC<T,M,N,-1> {
 }; // namepsace Detail
 
 ///////////////////////////////////////////////////////////////////////////////////
+// operator * (M, C)
 template<class T,int M, int N>
 KMat<T, M, N> operator * ( KMat<T, M, N> &m1, const T & v ) {
 	KMat<T,M,N> ret(m1);
